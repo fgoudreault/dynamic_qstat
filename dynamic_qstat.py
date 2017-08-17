@@ -26,7 +26,7 @@ class cursesinit:
 # parse the username
 username = sys.argv[-1]
 del sys.argv[-1]
-if username == "dynamic_qstat.py":
+if "dynamic_qstat.py" in username:
     raise ValueError("Did not specify a username. SPECIFY ONE!")
 
 with cursesinit() as stdscr:
