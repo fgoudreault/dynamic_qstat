@@ -40,6 +40,8 @@ with cursesinit() as stdscr:
             del proc
             stdscr.move(0, 0)
             d = datetime.datetime.now()
+            # add exit information after text
+            text += "\n\nType CTRL+c to exit."
             # add time
             text = ("%s %i %s %i %i:%i:%i\n\n" % (jours[d.weekday()], d.day,
                                                   months[d.month], d.year,
