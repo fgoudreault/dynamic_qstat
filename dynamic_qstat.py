@@ -31,7 +31,6 @@ if "dynamic_qstat.py" in username:
 
 with cursesinit() as stdscr:
     try:
-        (h, w) = stdscr.getmaxyx()
         while True:
             proc = subprocess.Popen(["qstat", "-u", username],
                                     stdout=subprocess.PIPE)
