@@ -1,8 +1,8 @@
+import argparse
 import curses
+import datetime
 import subprocess
 import time
-import datetime
-import sys
 
 
 months = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet",
@@ -23,33 +23,62 @@ class cursesinit:
         curses.endwin()
 
 
-# parse the username
-username = sys.argv[-1]
-del sys.argv[-1]
-if "dynamic_qstat.py" in username:
-    raise ValueError("Did not specify a username. SPECIFY ONE!")
+class DynamicQstat:
+    def __init__(self, username, update_time):
+        self.run(username, update_time)
 
-with cursesinit() as stdscr:
-    try:
-        while True:
-            proc = subprocess.Popen(["qstat", "-u", username],
-                                    stdout=subprocess.PIPE)
-            proc.wait()
-            text = proc.communicate()[0].decode("utf-8")
-            del proc
-            stdscr.move(0, 0)
-            d = datetime.datetime.now()
-            # add exit information after text
-            text += "\n\nType CTRL+c to exit."
-            # add time
-            text = ("%s %i %s %i %i:%i:%i\n\n" % (jours[d.weekday()], d.day,
-                                                  months[d.month], d.year,
-                                                  d.hour, d.minute, d.second)
-                    + text)
-            # add username on top
-            text = "qstat -u %s\n" % username + text
-            stdscr.addstr(text)
-            stdscr.refresh()
-            time.sleep(5)
-    except KeyboardInterrupt:
-        pass
+    def run(self, username, update_time):
+        with cursesinit() as stdscr:
+            try:
+                while True:
+                    proc = subprocess.Popen(["qstat", "-u", username],
+                                            stdout=subprocess.PIPE)
+                    proc.wait()
+                    text = proc.communicate()[0].decode("utf-8")
+                    del proc
+                    stdscr.move(0, 0)
+                    d = datetime.datetime.now()
+                    # add refresh rate
+                    text += "\n\nRefresh rate = %.1f seconds." % update_time
+                    # add exit information after text
+                    text += "\nType CTRL+c to exit."
+                    # add time
+                    text = ("%s %i %s %i %i:%i:%i\n\n" % (jours[d.weekday()],
+                                                          d.day,
+                                                          months[d.month],
+                                                          d.year,
+                                                          d.hour, d.minute,
+                                                          d.second)
+                            + text)
+                    # add username on top
+                    text = "qstat -u %s\n" % username + text
+                    stdscr.addstr(text)
+                    stdscr.refresh()
+                    time.sleep(update_time)
+            except KeyboardInterrupt:
+                pass
+
+
+class DynamicQstatArgParser:
+    def __init__(self):
+        self.parser = self.create_parser()
+
+    def parse_args(self):
+        args = vars(self.parser.parse_args())
+        self.username = args["username"]
+        self.timer = args["timer"]
+
+    def create_parser(self):
+        parser = argparse.ArgumentParser(description="Affichage dynamique d'un"
+                                                     " qstat pour un user.")
+        parser.add_argument("username", type=str,
+                            help="The username to check the qstat.")
+        parser.add_argument("--timer", "-t", type=float, default=5,
+                            help="Time between the qstat calls in seconds.")
+        return parser
+
+
+if __name__ == "__main__":
+    dp = DynamicQstatArgParser()
+    dp.parse_args()
+    DynamicQstat(dp.username, dp.timer)
