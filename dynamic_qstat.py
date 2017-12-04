@@ -45,7 +45,7 @@ class DynamicQstat:
                     # add time
                     text = ("%s %i %s %i %i:%i:%i\n\n" % (jours[d.weekday()],
                                                           d.day,
-                                                          months[d.month],
+                                                          months[d.month - 1],
                                                           d.year,
                                                           d.hour, d.minute,
                                                           d.second)
