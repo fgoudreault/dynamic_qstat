@@ -43,12 +43,13 @@ class DynamicQstat:
                     # add exit information after text
                     text += "\nType CTRL+c to exit."
                     # add time
-                    text = ("%s %i %s %i %i:%i:%i\n\n" % (jours[d.weekday()],
+                    text = ("%s %i %s %i %s:%s:%s\n\n" % (jours[d.weekday()],
                                                           d.day,
                                                           months[d.month - 1],
                                                           d.year,
-                                                          d.hour, d.minute,
-                                                          d.second)
+                                                          str(d.hour).zfill(2),
+                                                          str(d.minute).zfill(2),
+                                                          str(d.second).zfill(2))
                             + text)
                     # add username on top
                     text = "qstat -u %s\n" % username + text
