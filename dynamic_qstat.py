@@ -20,7 +20,10 @@ class NotParsedError(Exception):
 class cursesinit:
     def __init__(self, *args, **kwargs):
         self._stdscr = curses.initscr(*args, **kwargs)
+        # allow text to be longer than screen
         self._stdscr.scrollok(True)
+        # allow window to be cleared upon refresh
+        self._stdscr.clearok(True)
 
     def __enter__(self):
         return self._stdscr
